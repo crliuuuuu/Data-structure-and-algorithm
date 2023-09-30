@@ -18,7 +18,7 @@ The repository covers the following data structures, algorithms, and application
 To compile and generate executable files for the code in this repository, navigate to the `src` directory of each project and run `make` in the terminal:
 
 ```bash
-  make
+make
 ```
 
 You can then run the tests and output the results by executing the run script:
