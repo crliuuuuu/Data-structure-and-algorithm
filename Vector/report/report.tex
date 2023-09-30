@@ -1,0 +1,155 @@
+%!Tex Program = xelatex
+\documentclass[a4paper,12pt]{article}
+\usepackage{amssymb,amsmath,amsfonts,amsthm}
+%\usepackage{newtxtext,newtxmath}
+\usepackage{fontspec,xunicode,xltxtra}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{mathrsfs}
+%\usepackage{zhfontcfg}
+%\usepackage{indentfirst}
+%\usepackage[colorlinks,linkcolor=black]{hyperref}
+%\usepackage{setspace}
+%\usepackage{geometry}
+% or whatever
+
+%\usepackage[latin1]{inputenc}
+% or whatever
+
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+
+% Ubuntu
+\newfontfamily\hei{WenQuanYi Micro Hei Mono}
+\newfontfamily\whei{WenQuanYi Zen Hei Mono}
+\newfontfamily\kaishu{AR PL KaitiM GB}
+\newfontfamily\song{AR PL SungtiL GB}
+\newfontfamily\lishu{WenQuanYi Micro Hei Mono}
+\setmainfont[Mapping=tex-text]{AR PL SungtiL GB}
+\setsansfont[Mapping=tex-text]{AR PL KaitiM GB}
+\setmonofont[Mapping=tex-text]{WenQuanYi Micro Hei Mono}
+
+% Mac
+%% \newfontfamily\hei{STHeitiSC-Light}
+%% \newfontfamily\whei{STHeitiSC-Medium}
+%% \newfontfamily\kaishu{STKaitiSC-Regular}
+%% \newfontfamily\song{STSongti-SC-Regular}
+%% \newfontfamily\lishu{STLibianSC-Regular}
+%% \setmainfont[Mapping=tex-text]{STSongti-SC-Regular}
+%% \setsansfont[Mapping=tex-text]{STKaitiSC-Regular}
+%% \setmonofont[Mapping=tex-text]{STHeitiSC-Medium}
+\renewcommand{\baselinestretch}{1.25}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{ulem}
+\usepackage{pgf}
+\usepackage{graphicx}
+
+\usepackage[hmargin={3.18cm, 3.18cm}, width=14.64cm,
+             vmargin={2.54cm, 2.54cm}, height=24.62cm]{geometry}
+\pagestyle{empty}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy} %fancyhdr宏包新增的页面风格
+\renewcommand{\headrulewidth}{0pt}
+%\fancyhf{}
+\cfoot{第 \thepage 页，共 \pageref{LastPage} 页}%当前页 of 总页数
+
+\renewcommand\baselinestretch{1.2}
+\setlength{\headwidth}{\textwidth}
+
+%\renewcommand{\labelenumi}{\bf{\chinese{enumi}、}}
+\renewcommand{\labelenumii}{\arabic{enumii}.}
+\renewcommand{\labelenumiii}{\Roman{enumiii}}
+
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaoerhao}{\fontsize{18pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont} % 字号设置
+
+\newtheorem{theorem}{定理}
+\newtheorem{definition}{定义}
+\addto{\captionsenglish}{%
+  \renewcommand{\refname}{参考文献}%
+  \renewcommand{\proofname}{证明}%
+  \renewcommand{\figurename}{图}%
+%  \renewcommand{\bibname}{参考文献}%
+}
+
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+
+
+\begin{document}
+
+\title{\hei Vector类中有关Spare Capacity的分析、测试和结果说明}
+
+
+%\date{}
+\maketitle
+
+%%------------------------------------------
+%% \section{问题}
+%% \setcounter{equation}{0}
+%% \setcounter{theorem}{0}
+%% \setcounter{definition}{0}
+
+\begin{enumerate}
+\item \verb|SPARE_CAPACITY|在类中的作用的分析：
+\begin{enumerate}
+    \item \verb|SPARE_CAPACITY|的含义和作用：根据\verb|Vector.h|头文件程序，在构造\verb|Vector|时，内存的容量并不是用户输入的\verb|initSize|，而是
+    \verb|initSize| +\verb| SPARE_CAPACITY|。\verb|SPARE_CAPACITY|给\verb|Vector|保留了适当容量，这是因为：
+    \begin{enumerate}
+        \item 当容器实际的大小超过\verb|theCapacity|的大小时，\verb|Vector|将调用\verb|reserve()|函数分配一段大小为\verb|(2*theCapacity + 1)|的新的内存，并将原内容移动过去，而这是一个很耗费时间、且占用不少内存空间的过程。
+    \end{enumerate}
+    使用\verb|SPARE_CAPACITY|为容器分配一定的保留容量，可以避免程序频繁地进行扩容以致消耗大量时间，在一定程度上解决这个问题。
+    \item \verb|SPARE_CAPACITY|对操作效率的影响：在书第90页中，分析代码可得，\verb|SPARE_CAPACITY|对操作效率的影响主要体现在\verb|push_back()|
+    操作上。如果执行\verb|push_back()|时检测到已达最大容量，那么程序就分配一段新的内存。当\verb|SPARE_CAPACITY|偏小时，我们不断执行\verb|push_back()|操作时，系统就会频繁的分配内存，由此消耗大量的时间；当\verb|SPARE_CAPACITY|偏大时，每次构造\verb|Vector|的实例时，都会构造一个过大的容器，这将造成空间的浪费，而申请大容量的内存也会消耗更多的时间。因此，\verb|SPARE_CAPACITY|过大或者过小都会造成操作效率的降低，它应该存在一个最优的取值。
+\end{enumerate}
+\item \verb|SPARE_CAPACITY|的最优取值的测试：
+\begin{enumerate}
+    \item 理论分析：
+    \begin{enumerate}
+        \item 根据题目条件，已知用户{\hei 初始输入}的\verb|Vector|的大小是从\verb|1-N|均匀分布的。为了得到\verb|SPARE_CAPACITY|的最优取值，我们首先需要构建其评价体系。根据前文的分析，\verb|SPARE_CAPACITY|主要会对程序的时空效率产生影响，因此我将从时间和空间两方面进行分析。
+        \item 时间方面，根据前文的分析，\verb|push_back()|操作的次数会对程序运行的时间产生影响。为了对\verb|push_back()|操作次数有一个合理的估计，将有如下假设：
+        \begin{enumerate}
+            \item {\hei 一系列初始大小为x的\verb|Vector|，其最终平均增加的容量是一个关于x的函数\verb|f(x)=[k*x]|，其中k是一个与\verb|Vector|实际性质有关的常数，\verb|[]|表示上取整。}
+        \end{enumerate}
+        对此的合理性解释是，相同性质（类型）的\verb|Vector|，容量越大可能的改动就越多，因此可假设其呈正比关系。对于\verb|k|，如果\verb|vector|类用于记录班级成员，那么\verb|k|的值会很小(如\verb|0.1|)；如果是用于记录消费清单，那么\verb|k|的值可能会很大(如\verb|10|)。基于这个假设，当\verb|SPARE_CAPACITY|逐渐增大，大小为\verb|i|的\verb|Vector|通过\verb|push_back()|操作增大为\verb|f(i)|时，一方面调用\verb|reserve()|的次数减少了时间消耗，另一方面每次分配的内存容量变大又增加了时间消耗。{\hei 具体哪个因素起主导作用需要程序的验证。}
+        \item 空间方面，显然有，当\verb|SPARE_CAPACITY|增加时，一方面分配的内存空间增加；另一方面对于相同大小的\verb|Vector|，当其达到最大容量时，在绝大多数情况下空闲的内存空间也在增加。因此可以说，\verb|SPARE_CAPACITY|越大，程序的空间效率越低。
+        \item 对于\verb|SPARE_CAPACITY|的最优值，我们希望它是一个时空效率都较优的解，而不是在某一方面拥有极高的效率而在另一方面效率很低的解。由于网络上并没有足够的已知数据来给时间和空间效率赋予合适的权重，对于不同的\verb|SPARE_CAPACITY|,我将分别对时间效率和空间效率进行排序，然后将其时间和空间效率的位次{\hei 相乘}(这样可以保证解的时空效率均衡且较优)，作为该\verb|SPARE_CAPACITY|的时空效率的综合值，并以此得出最优解。({\hei 这也就是下文程序的测试思路.})
+        \item 对于一系列大小为\verb|1-N|均匀分布的\verb|Vector|，其增加的容量的最大值为\verb|f(N)=[k*N]|。对于大于\verb|f(N)|的\verb|SPARE_CAPACITY|，它仅仅是占用了更多的内存空间而已。因此，仅需考虑范围在\verb|1-f(N)|之间的\verb|SPARE_CAPACITY|。而根据前文算法得出的
+        \verb|SPARE_CAPACITY|的最优值，我们期待它是一个关于\verb|f(N)|的正比例函数{\hei \verb|optimal=p|*\verb|f(N)|}。这样的话，实际应用时我们仅需知道\verb|k|和\verb|N|,即可得出最优值。另一方面，根据前文对于时空效率的理论分析，可以大致得出\verb|SPARE_CAPACITY|的最优值不会是一个很小或者很大的数，即\verb|p|不会是一个很接近\verb|0|或者\verb|1|的值。较为精确的\verb|p|的值需要运行程序得出(因为时间效率方面哪一个因素起主导作用是有待程序确认的)。
+    \end{enumerate}
+    \item 测试说明：
+    \begin{enumerate}
+        \item 测试输入：
+        \begin{enumerate}
+        \item 运行 \verb|make| 命令，自动编译 \verb|main.cpp| 并生成可执行文件 \verb|test|；
+        \item 运行 \verb|bash run| 命令后，{\hei 在同一行后输入三个正整数(用空格间隔)，它们的含义如下。} 第一个参数：程序 \verb|main.cpp| 运行的次数； 第二个参数：\verb|N|的值；第三个参数：\verb|k|的值。
+        \item 注意事项：一方面\verb|k*N|的值不能过小，否则会产生偶然误差；另一方面由于算法的时间复杂度是\verb|O(N^3)|,如果\verb|k*N|的值过大会使程序运行缓慢。\verb|k*N|的值{\hei 建议在\verb|50-200|之间。}
+        \end{enumerate}
+        \item 测试输出：
+        \begin{enumerate}
+        \item 每一次运行 \verb|main.cpp|，都将输出最优解的大小以及\verb|p|的值(\verb|p|即最优解的大小和\verb|k*N|的比值)。程序已经给输出做出了清晰的解释。
+        \end{enumerate}
+    \end{enumerate}
+    \item 测试结果和最终结论：通过不断改变\verb|k|和\verb|N|的值，可以发现\verb|p|的值在某一个较小的范围内波动。大量测试后，发现\verb|p|存在一个大致范围：一个以\verb|0.25|为中心的小邻域。由此我们可以得出结论，当\verb|k|已知的\verb|vector|的大小为\verb|1-N|均匀分布时，\verb|SPARE_CAPACITY|的最优值约为\verb|0.25*f(N)|。一种可能的解释是，当\verb|SPARE_CAPACITY|增加时，由于时间效率方面的内存配分次数减少和容量增加两个因素的共同作用，时间效率在某一小段是减小的（内存分配容量增加占主导因素），此后时间效率增加（内存分配次数减少占主导因素）；另一方面，在\verb|SPARE_CAPACITY|较大时，其空间效率降低的幅度大于时间效率增加的幅度。也就是说，比起程序运行时间的增加，浪费的内存增加得更为明显。此外，\verb|p=0.25|也较为符合实际应用中给容器留的余量大小。综上，可以说程序测试的结果是合理的。
+    \end{enumerate}
+
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{ref}
+\end{document}

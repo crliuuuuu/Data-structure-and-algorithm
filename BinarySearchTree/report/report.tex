@@ -1,0 +1,196 @@
+%!Tex Program = xelatex
+\documentclass[a4paper,12pt]{article}
+\usepackage{amssymb,amsmath,amsfonts,amsthm}
+%\usepackage{newtxtext,newtxmath}
+\usepackage{fontspec,xunicode,xltxtra}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{mathrsfs}
+%\usepackage{zhfontcfg}
+%\usepackage{indentfirst}
+%\usepackage[colorlinks,linkcolor=black]{hyperref}
+%\usepackage{setspace}
+%\usepackage{geometry}
+% or whatever
+
+%\usepackage[latin1]{inputenc}
+% or whatever
+
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+
+% Ubuntu
+\newfontfamily\hei{WenQuanYi Micro Hei Mono}
+\newfontfamily\whei{WenQuanYi Zen Hei Mono}
+\newfontfamily\kaishu{AR PL KaitiM GB}
+\newfontfamily\song{AR PL SungtiL GB}
+\newfontfamily\lishu{WenQuanYi Micro Hei Mono}
+\setmainfont[Mapping=tex-text]{AR PL SungtiL GB}
+\setsansfont[Mapping=tex-text]{AR PL KaitiM GB}
+\setmonofont[Mapping=tex-text]{WenQuanYi Micro Hei Mono}
+
+% Mac
+%% \newfontfamily\hei{STHeitiSC-Light}
+%% \newfontfamily\whei{STHeitiSC-Medium}
+%% \newfontfamily\kaishu{STKaitiSC-Regular}
+%% \newfontfamily\song{STSongti-SC-Regular}
+%% \newfontfamily\lishu{STLibianSC-Regular}
+%% \setmainfont[Mapping=tex-text]{STSongti-SC-Regular}
+%% \setsansfont[Mapping=tex-text]{STKaitiSC-Regular}
+%% \setmonofont[Mapping=tex-text]{STHeitiSC-Medium}
+\renewcommand{\baselinestretch}{1.25}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{ulem}
+\usepackage{pgf}
+\usepackage{graphicx}
+
+\usepackage[hmargin={3.18cm, 3.18cm}, width=14.64cm,
+             vmargin={2.54cm, 2.54cm}, height=24.62cm]{geometry}
+\pagestyle{empty}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy} %fancyhdr宏包新增的页面风格
+\renewcommand{\headrulewidth}{0pt}
+%\fancyhf{}
+\cfoot{第 \thepage 页，共 \pageref{LastPage} 页}%当前页 of 总页数
+
+\renewcommand\baselinestretch{1.2}
+\setlength{\headwidth}{\textwidth}
+
+%\renewcommand{\labelenumi}{\bf{\chinese{enumi}、}}
+\renewcommand{\labelenumii}{\arabic{enumii}.}
+\renewcommand{\labelenumiii}{\Roman{enumiii}}
+
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaoerhao}{\fontsize{18pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont} % 字号设置
+
+\newtheorem{theorem}{定理}
+\newtheorem{definition}{定义}
+\addto{\captionsenglish}{%
+  \renewcommand{\refname}{参考文献}%
+  \renewcommand{\proofname}{证明}%
+  \renewcommand{\figurename}{图}%
+%  \renewcommand{\bibname}{参考文献}%
+}
+
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+
+
+\begin{document}
+
+\title{\hei 二叉搜索树排序设计思路和测试说明}
+
+
+%\date{}
+\maketitle
+
+%%------------------------------------------
+%% \section{问题}
+%% \setcounter{equation}{0}
+%% \setcounter{theorem}{0}
+%% \setcounter{definition}{0}
+
+\begin{enumerate}
+\item 项目设计思路：
+\begin{enumerate}
+    \item \verb|BinarySearchTree.h|的实现：
+    \begin{enumerate}
+        \item \verb|BinarySearchTree.h|的框架摘自课本\verb|4.3|节的二叉查找树的代码。在能实现二叉搜索树排序的前提下，我略去了头文件中与本项目无关的类成员函数。此外我改写了\verb|printTree()|函数，使得\verb|main.cpp|调用该函数后即可将排序完成的数据存储在\verb|vector|中。因为二叉搜索树满足\verb|:|对于所有节点\verb|X|，它左子树的所有项均小于\verb|X|的项，右子树所有项均大于\verb|X|中的项。所以只需对二叉搜索树进行中序遍历，并将每个节点用\verb|push_back()|操作推入\verb|vector|的尾端即可。
+    \end{enumerate}
+    \item \verb|main.cpp|的实现：
+    \begin{enumerate}
+        \item {\hei 数据的随机生成}：用户输入进行排序的元素个数\verb|N|后，程序将自动生成一个大小为\verb|N|的 \verb|vector<TN> DATA|。由于本程序使用的具体的模板类型是\verb|Int|,因此，为了方便验证排序的结果,\verb|DATA|将恰好含有\verb|[0,N-1]|中的全部整数(这样排序好的数据恰好是\verb|0,1,|
+        \verb|...N-1|
+        ，{\hei 可以方便我们的检验})。具体的实现方式是，对于\verb|[0,|
+        \verb|N-1]|中的全部整数，给其一个随机的下标\verb|p|。如果\verb|vector[p]|已经被赋值，则向下寻找至第一个未赋值的单元并给其赋值。
+        \item {\hei \verb|Randomized_BST_sort()|的实现}：根据项目要求，我们首先对\verb|DATA|中的数据进行打乱。实现方式与随机生成几乎一模一样，只需给每个数赋予一个新的随机下标即可。然后，将打乱的数据按顺序插入二叉搜索树中，并调用\verb|printTree()|把排序后的结果覆盖到\verb|DATA|中以便之后的输出。
+    \end{enumerate}
+    \item {\hei 算法的时间复杂度}：
+    
+    二叉搜索树排序主要涉及树的建立和中序遍历两个步骤，具体分析如下：
+    \begin{enumerate}
+        \item 二叉搜索树的建立：对于一个有\verb|N|个节点的二叉树，根据课本
+        \verb|4.3.6|的分析，任意节点的期望深度是\verb|O(log N)(以2为底，下同)|。对于每个节点，在期望深度下插入到树中，因此这一步的时间复杂度是\verb|O(N log N)|。
+        \item 中序遍历：设\verb|N|个节点遍历所需时间为\verb|T(N)|，则根据\verb|printTree()|
+        的代码，可得：\verb|T(N)=2*T(N/2)+1|。该递推式满足主定理的第一种情况，由此得\verb|T(N)=θ(N)|。
+        \item 综上，理论上二叉搜索树排序的时间效率是\verb|O(N log N)|，为了验证这个结论，程序对随机生成的\verb|DATA|进行多次打乱\verb|(默认200次)|，并调用\verb|high_resolution_clock|对整个排序操作进行计时，取平均值后输出。
+    \end{enumerate}
+\end{enumerate}
+\item 测试说明：
+\begin{enumerate}
+    \item 测试输入：
+    \begin{enumerate}
+        \item 运行 \verb|make| 命令，自动编译 \verb|main.cpp| 并生成可执行文件 \verb|test|；
+        \item 运行 \verb|bash run| 命令，{\hei 在同一行后输入一个正整数\verb|N|，表示进行排序的元素的个数}。
+        \item {\hei 注意事项：建议\verb|N|的值不要太小也不要太大}。如果\verb|N|的值太小，程序运行过快。由于排序运行的平均时间是以微秒为单位的，可能会输出\verb|0 microseconds|的结果；如果\verb|N|的值过大，程序运行会十分缓慢。{\hei 建议的N的值是50-50000。}
+    \end{enumerate}
+    \item 测试输出：
+        \begin{enumerate}
+        \item 测试输出打乱排序前随机生成的数组\verb|(恰好含有[0,N-1]中的全部整数)|、排序后的数组和二叉搜索树排序所用平均时间\verb|T(N)|。具体在输出中都有详细的说明。
+    \end{enumerate}
+\end{enumerate}
+\item 测试结论：
+\begin{enumerate}
+     \item 经验证，无论\verb|N|取什么值，输出的排序后的\verb|DATA|都是\verb|0,1,...N-1|，这说明{\hei 该二叉搜索树的排序算法是正确的}。
+     \item 对于二叉搜索树排序所用的平均时间\verb|T(N)|，经多次测试得如下平均结果\verb|(|部分值\verb|)|：
+     
+     \begin{center}
+     \begin{tabular}{|c|c|}
+     \hline
+        \verb|N|  & \verb|T(N)/ms| \\
+     \hline
+     100  & 0.006 \\
+     \hline
+     1000 & 0.12 \\
+     \hline
+     10000 & 1.3 \\
+     \hline
+     100000 & 23 \\
+     \hline
+     \end{tabular}
+     \end{center}
+
+     经过计算，可以发现当\verb|N|较小\verb|(<500)|或者过大\verb|(>10000)|时，\verb|T(N)|的增长速率要大于\verb|(N log N)|。{\hei 对此的解释是}，虽然理论上说二叉搜索树排序的运行时间是\verb|O(N log N)|，但是它有一个明显的问题，即在中序遍历的时候用到了线性附加内存。对于\verb|printTree()|中的\verb|push_back()|操作，正如在\verb|Vector|模板类的实现中所分析的，
+     \verb|SPARE_CAPACITY|不能过大或者过小。因此。当\verb|N|过大时，不断进行\verb|push_back()|操作都会明显地减慢排序的速度；当\verb|N|过小时，进行\verb|push_back()|操作时间在总排序的时间中占比较大，而且此时的二叉查找树不平衡的概率较大\verb|(|因为节点数较少\verb|)|。这些因素从而使得\verb|T(N)|的增长速率要大于\verb|(N log N)|。
+     
+     为了验证该想法的正确性，我将\verb|BinarySearchTree.h|头文件中的\verb|push_back()|操作改为直接输出至屏幕\verb|(|这样能保证对不同\verb|N|的输出操作时间几乎都是相同的\verb|)|，经多次测试得到如下平均结果\verb|(|部分值\verb|)|：
+
+     \begin{center}
+     \begin{tabular}{|c|c|}
+     \hline
+        \verb|N|  & \verb|T(N)/ms| \\
+     \hline
+     100  & 0.59 \\
+     \hline
+     1000 & 6.8 \\
+     \hline
+     10000 & 72 \\
+     \hline
+     100000 & 780 \\
+     \hline
+     \end{tabular}
+     \end{center}
+     
+     由此可见，虽然\verb|T(N)|增大了不少\verb|(|因为输出的用时较长\verb|)|，但是\verb|T(N)|的增长速率要小于\verb|(N log N)|。由此验证了根据理论得出的结论：平均情况下，二叉搜索树排序的时间复杂度是\verb|O(N log N)|。
+
+\end{enumerate}
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{ref}
+\end{document}

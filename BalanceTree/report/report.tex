@@ -1,0 +1,168 @@
+%!Tex Program = xelatex
+\documentclass[a4paper,12pt]{article}
+\usepackage{amssymb,amsmath,amsfonts,amsthm}
+%\usepackage{newtxtext,newtxmath}
+\usepackage{fontspec,xunicode,xltxtra}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{mathrsfs}
+%\usepackage{zhfontcfg}
+%\usepackage{indentfirst}
+%\usepackage[colorlinks,linkcolor=black]{hyperref}
+%\usepackage{setspace}
+%\usepackage{geometry}
+% or whatever
+
+%\usepackage[latin1]{inputenc}
+% or whatever
+
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+
+% Ubuntu
+\newfontfamily\hei{WenQuanYi Micro Hei Mono}
+\newfontfamily\whei{WenQuanYi Zen Hei Mono}
+\newfontfamily\kaishu{AR PL KaitiM GB}
+\newfontfamily\song{AR PL SungtiL GB}
+\newfontfamily\lishu{WenQuanYi Micro Hei Mono}
+\setmainfont[Mapping=tex-text]{AR PL SungtiL GB}
+\setsansfont[Mapping=tex-text]{AR PL KaitiM GB}
+\setmonofont[Mapping=tex-text]{WenQuanYi Micro Hei Mono}
+
+% Mac
+%% \newfontfamily\hei{STHeitiSC-Light}
+%% \newfontfamily\whei{STHeitiSC-Medium}
+%% \newfontfamily\kaishu{STKaitiSC-Regular}
+%% \newfontfamily\song{STSongti-SC-Regular}
+%% \newfontfamily\lishu{STLibianSC-Regular}
+%% \setmainfont[Mapping=tex-text]{STSongti-SC-Regular}
+%% \setsansfont[Mapping=tex-text]{STKaitiSC-Regular}
+%% \setmonofont[Mapping=tex-text]{STHeitiSC-Medium}
+\renewcommand{\baselinestretch}{1.25}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{ulem}
+\usepackage{pgf}
+\usepackage{graphicx}
+
+\usepackage[hmargin={3.18cm, 3.18cm}, width=14.64cm,
+             vmargin={2.54cm, 2.54cm}, height=24.62cm]{geometry}
+\pagestyle{empty}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy} %fancyhdr宏包新增的页面风格
+\renewcommand{\headrulewidth}{0pt}
+%\fancyhf{}
+\cfoot{第 \thepage 页，共 \pageref{LastPage} 页}%当前页 of 总页数
+
+\renewcommand\baselinestretch{1.2}
+\setlength{\headwidth}{\textwidth}
+
+%\renewcommand{\labelenumi}{\bf{\chinese{enumi}、}}
+\renewcommand{\labelenumii}{\arabic{enumii}.}
+\renewcommand{\labelenumiii}{\Roman{enumiii}}
+
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaoerhao}{\fontsize{18pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont} % 字号设置
+
+\newtheorem{theorem}{定理}
+\newtheorem{definition}{定义}
+\addto{\captionsenglish}{%
+  \renewcommand{\refname}{参考文献}%
+  \renewcommand{\proofname}{证明}%
+  \renewcommand{\figurename}{图}%
+%  \renewcommand{\bibname}{参考文献}%
+}
+
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+
+
+\begin{document}
+
+\title{\hei AVLTree 和 SplayTree 排序效率比较设计思路和测试说明}
+
+
+%\date{}
+\maketitle
+
+%%------------------------------------------
+%% \section{问题}
+%% \setcounter{equation}{0}
+%% \setcounter{theorem}{0}
+%% \setcounter{definition}{0}
+
+\begin{enumerate}
+\item 项目设计思路：
+\begin{enumerate}
+    \item \verb|BalanceTree.h|的实现：
+    \begin{enumerate}
+        \item \verb|BalanceTree.h|内包含\verb|AVLTree|和\verb|SplayTree|两个模板类。其中\verb|AVLTree|的框架摘自课本\verb|4.4|节的\verb|AVL|树的代码。此外我改写了\verb|printTree()|函数，使得\verb|main.cpp|调用该函数后即可将排序完成的数据通过中序遍历存储在\verb|vector|中。{\hei 为了排序时能更好的控制变量}，我将\verb|SplayTree|类的框架大致与\verb|AVLTree|类保持一致。二者主要的区别是\verb|AVLTree|和\verb|SplayTree|分别使用了\verb|balance|和\verb|splay|函数。其中\verb|splay|函数实现了自底向上伸展的过程。与书中思路略有不同的是，本函数是从祖父的角度对各种情形进行考虑的，即从路径上自底向上对存在子节点和孙节点的所有节点进行类似于书上的判断。此外，\verb|insert|函数在递归插入数据的同时也间接给出了插入路径。这些细节帮助我既可以避免通过堆栈或者新增一个记录父节点的变量来回溯，也防止了指针复杂运算的情况发生。
+    \end{enumerate}
+    \item \verb|main.cpp|的实现：
+    \begin{enumerate}
+        \item {\hei 数据的打乱}：用户输入进行排序的元素个数\verb|N|后，程序将自动生成一个大小为\verb|N|的 \verb|vector<TN> DATA|。由于本程序使用的具体的模板类型是\verb|Int|,因此，为了方便验证排序的结果,打乱前后的\verb|DATA|将恰好含有\verb|[0,N-1]|中的全部整数(这样排序好的数据恰好是\verb|0,1,|
+        \verb|...N-1|
+        ，{\hei 可以方便我们的检验})。具体的实现方式是，对于\verb|[0,|
+        \verb|N-1]|中的全部整数，给其一个随机的下标\verb|p|。如果\verb|vector[p]|已经被赋值，则向下寻找至第一个未赋值的单元并给其赋值。
+        \item {\hei \verb|Randomized_BT_sort()|和排序效率比较的实现}：根据项目要求，我们首先对\verb|DATA|中的数据进行多次打乱。然后，将每次打乱的数据分别用\verb|AVLTree|和\verb|SplayTree|两种数据结构进行\verb|BST|排序。并分别记录两种数据结构排序所用的总时间，从而进行比较。
+    \end{enumerate}
+\end{enumerate}
+\item 测试说明：
+\begin{enumerate}
+    \item 测试输入：
+    \begin{enumerate}
+        \item 运行 \verb|make| 命令，自动编译 \verb|main.cpp| 并生成可执行文件 \verb|test|；
+        \item 运行 \verb|bash run| 命令，{\hei 在同一行后输入一个正整数\verb|N|，表示进行排序的元素的个数}。
+        \item {\hei 注意事项：建议\verb|N|的值不要太小也不要太大}。如果\verb|N|的值太小，排序的偶然性会较大，不宜体现平均水平；如果\verb|N|的值过大，程序运行会十分缓慢。{\hei 建议的N的值是50-50000。}
+    \end{enumerate}
+    \item 测试输出：
+        \begin{enumerate}
+        \item 测试输出分别用\verb|AVLTree|和\verb|SplayTree|进行排序后的数组和排序所用总时间。具体在输出中都有详细的说明。
+    \end{enumerate}
+\end{enumerate}
+\item 测试结论：
+\begin{enumerate}
+     \item 经验证，无论\verb|N|取什么值，输出的排序后的\verb|DATA|都是\verb|0,1,...N-1|，这说明{\hei 用\verb|AVLTree|和\verb|SplayTree|进行排序的算法都是正确的}。
+     \item 对于两种排序所用的总时间\verb|T|，经多次测试得如下平均结果\verb|(|部分值\verb|)|：
+     
+     \begin{center}
+     \begin{tabular}{|c|c|c|}
+     \hline
+        \verb|N|  & \verb|T(AVLTree)/ms| & \verb|T(SplayTree)/ms|\\
+     \hline
+     100  & 1.7 & 2.4 \\
+     \hline
+     1000 & 35 & 52 \\
+     \hline
+     10000 & 395 & 578 \\
+     \hline
+     100000 & 6100 & 8950 \\
+     \hline
+     \end{tabular}
+     \end{center}
+
+     纵向比较，我们测试出发现当\verb|N|较小\verb|(<500)|或者过大\verb|(>10000)|时， 
+     \verb|T(N)|的增长速率要略大于\verb|(N log N)|。{\hei 对此在上一次作业中已经有了详细的解释，是\verb|printTree()|中的\verb|push_back()|操作导致的。}
+     
+     我们更关心的是横向比较。结果表明，虽然两种数据结构排序用时增长速率是一致的，这也符合书中对此的分析，但是{\hei 对于相同的\verb|N|，\verb|SplayTree|的用时总是\verb|AVLTree|的约\verb|1.5|倍}。对此的解释是，针对此排序算法，每次进行\verb|insert|操作时，\verb|AVLTree|只会对自底向上第一个不平衡的节点进行旋转操作，而\verb|SplayTree|为了把当前插入的数据自底向上旋转至根节点，会对路径上每一个节点都进行旋转。因此，\verb|SplayTree|的展开操作总是比\verb|AVLTree|的平衡操作更耗时。{\hei 空间方面}，在本程序尽可能控制变量的基础上，两种数据结构的空间上的区别是，\verb|AVLTree|需要对节点增加一个变量来记录录高度，这当数据量相当庞大的时候也是一个不小的开销。综上，可以得出结论：{\hei 就本排序算法而言，时间效率\verb|AVLTree|占优，空间效率\verb|SplayTree|占优。}
+
+\end{enumerate}
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{ref}
+\end{document}
