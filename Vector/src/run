@@ -1,6 +1,0 @@
-#!/bin/bash
-
-for ((i=1;i<=$1;i++))
-do
-    ./test $2 $3
-done
